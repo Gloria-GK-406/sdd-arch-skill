@@ -14,7 +14,7 @@ Spec-driven development (SDD) already has a shape: design → spec → plan → 
 ## When to use
 
 - The main agent is running any spec-driven flow (writing a spec, or executing one to landing) in a repo that keeps an architecture-intent tree.
-- Invoke it **once at spec finalization** (touchpoint A) and **once the moment the implementation lands and tests pass** — *before* the host flow offers any merge / PR / integration choice (touchpoint B). Touchpoint B shares its trigger with `superpowers:finishing-a-development-branch` ("implementation complete, all tests pass") and must run **first**, gating it — it is a post-landing check gate, not a step inside the merge decision.
+- Invoke it **once at spec finalization** (touchpoint A) and **once the implementation has landed and its tests / review pass**, *before* the branch's wrap-up — i.e. before the host flow offers any merge / PR / integration choice (touchpoint B). Touchpoint B is a **post-landing check gate**, not a step inside the merge decision: it runs **first** and the integration decision waits behind it.
 
 **Do not use for**: a non-spec, one-off change with no spec artifact (run `arch-spec-review` directly if you want an architecture check); editing documents ahead of code (forbidden — see the iron principle).
 
@@ -50,7 +50,7 @@ The **doc path + INV-id** is the precise anchor `arch-spec-review` uses to tell 
 
 ### Touchpoint B — the moment code lands (implementation complete, tests green), before any merge / PR decision
 
-> **This is a post-landing gate, not a step inside the merge decision.** It fires the instant the code is done and tests pass — the *same* trigger as `superpowers:finishing-a-development-branch`. When the host flow is about to offer merge / PR / cleanup options, touchpoint B runs **first** and the integration decision waits behind it. If you are being asked *how* to merge before review + reconcile have run, the gate has already been skipped — back up and run it.
+> **This is a post-landing gate, not a step inside the merge decision.** It fires the instant the code is done and its tests / review pass — the same point at which the host flow would normally begin branch wrap-up. When the host flow is about to offer merge / PR / cleanup options, touchpoint B runs **first** and the integration decision waits behind it. If you are being asked *how* to merge before review + reconcile have run, the gate has already been skipped — back up and run it.
 
 1. **Dispatch `arch-spec-review`**, giving it as material: the diff, the relevant architecture documents, `intent-contract`, **and the spec document itself** (you know where this SDD flow keeps specs — pass that path; review does not go looking for it). The spec's intent declaration lets review run its consistency check (declared crossings realized? nothing undeclared crossed?).
 2. **Resolve review's findings**: undeclared violations / inconsistencies → fix code or escalate per the conflict artifacts; a large deviation → redesign the spec with the artifacts (do not blind-rerun).
@@ -78,7 +78,7 @@ The **doc path + INV-id** is the precise anchor `arch-spec-review` uses to tell 
 
 - Editing or creating an architecture document **before** the code it describes has landed (violates the iron principle — intent belongs in the spec until then).
 - A spec that crosses a marked boundary but carries **no intent declaration** (the crossing will read as accidental drift, correctly — but the author should have declared it; surface this).
-- The host flow's integration step (e.g. `superpowers:finishing-a-development-branch`) presenting merge / PR / cleanup options **before** touchpoint B has run. Touchpoint B fires on "code landed + tests green" and the integration decision waits behind it — being asked *how* to merge before review + reconcile ran means the gate was mis-ordered; back up.
+- The host flow's branch wrap-up / integration step presenting merge / PR / cleanup options **before** touchpoint B has run. Touchpoint B fires on "code landed + tests / review pass" and the integration decision waits behind it — being asked *how* to merge before review + reconcile ran means the gate was mis-ordered; back up.
 - Reaching merge with documents not yet reconciled to the landed code.
 - Doing the doc work yourself in the conductor instead of dispatching `arch-doc-update` / `arch-doc-build` / `arch-why-elicit`.
 - Hardcoding the spec path into `arch-spec-review` instead of passing it from here.
@@ -96,4 +96,4 @@ The **doc path + INV-id** is the precise anchor `arch-spec-review` uses to tell 
 - **Front (declaration)**: parses documents per `../arch-docs-conventions/references/intent-contract.md`.
 - **Back (review + reconcile)**: dispatches `arch-spec-review` (with the spec) → `arch-doc-update` or `arch-doc-build` → `arch-why-elicit`.
 - **Tree-scale variants**: for a whole subsystem rather than one spec, the build/update side may run via `arch-doc-orchestrate` and the WHY side via `arch-why-orchestrate`.
-- **Host flow**: this skill is an **add-on** to the project's existing spec-driven flow (e.g. `superpowers:writing-plans` / `superpowers:executing-plans` / `superpowers:finishing-a-development-branch`); it does not replace it. Touchpoint B **precedes** the host's integration step: it triggers on the same "implementation complete, tests pass" condition as `superpowers:finishing-a-development-branch` and must clear **before** that step offers merge / PR / cleanup — the host's merge prompt fires only once touchpoint B has passed.
+- **Host flow**: this skill is an **add-on** to the project's existing spec-driven flow (e.g. `superpowers:writing-plans` / `superpowers:executing-plans` / `superpowers:finishing-a-development-branch`); it does not replace it. Touchpoint B **precedes** the host's branch wrap-up / integration step: it triggers when the implementation has landed and tests / review pass, and must clear **before** that step offers merge / PR / cleanup — the host's merge prompt fires only once touchpoint B has passed.
