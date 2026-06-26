@@ -1,0 +1,18 @@
+{
+  "name": "arch-skills",
+  "version": "0.1.0",
+  "description": "Isomorphic architecture-intent documentation and architecture-level review, plus a spec-driven-development conductor, to detect and prevent architectural drift early.",
+  "homepage": "https://github.com/OWNER/arch-skills",
+  "license": "MIT",
+  "keywords": ["architecture", "documentation", "drift", "architecture-review", "refactoring", "skills", "agent-skills", "spec-driven-development"],
+  "skills": "./skills/",
+  "skillInstructions": "Kimi Code tool mapping for arch-skills:\n\n- When a skill says to ask, interview, or wait for the human (arch-why-elicit and arch-why-orchestrate are human-in-the-loop), call Kimi Code's `AskUserQuestion` tool — do not render the questions as plain assistant text.\n- When a skill says to dispatch a subagent (arch-doc-orchestrate fans out build/update; arch-spec-flow dispatches arch-spec-review), use Kimi Code's `Agent` tool with a Kimi subagent type (do not pass `general-purpose`); use `subagent_type: \"coder\"` for filled document/review prompts and `subagent_type: \"explore\"` for read-only codebase exploration.\n- Keep dependent steps sequential; use multiple `Agent` calls, or `run_in_background` only for genuinely independent work.\n- When a skill refers to the `Skill` tool, use Kimi Code's native `Skill` tool. Use `Read`, `Write`, `Edit`, `Grep`, `Glob` by their actual exposed names; `Grep` for content search, `Glob` for path search.",
+  "interface": {
+    "displayName": "Arch Skills",
+    "shortDescription": "Architecture-intent documentation and architecture-level review for coding agents",
+    "longDescription": "Build isomorphic architecture-intent documents, elicit and ground their rationale, review landed specs against them, and weave both into a spec-driven development flow — to detect and prevent architectural drift early.",
+    "developerName": "OWNER",
+    "capabilities": ["Interactive", "Read", "Write"],
+    "websiteURL": "https://github.com/OWNER/arch-skills"
+  }
+}

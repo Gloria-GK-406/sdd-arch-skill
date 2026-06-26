@@ -1,0 +1,15 @@
+{
+  "name": "arch-skills-dev",
+  "description": "Marketplace for the arch-skills architecture documentation & review skill group",
+  "owner": {
+    "name": "OWNER"
+  },
+  "plugins": [
+    {
+      "name": "arch-skills",
+      "description": "Isomorphic architecture-intent documentation and architecture-level review skill group",
+      "version": "0.1.0",
+      "source": "./"
+    }
+  ]
+}

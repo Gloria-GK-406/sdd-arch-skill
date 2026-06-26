@@ -1,0 +1,10 @@
+# Research / test scratch — contains excerpts of a private codebase; never publish
+_baseline/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db

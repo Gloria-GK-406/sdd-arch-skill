@@ -1,0 +1,33 @@
+{
+  "name": "arch-skills",
+  "version": "0.1.0",
+  "description": "Isomorphic architecture-intent documentation and architecture-level review skill group for coding agents (Claude Code, Codex, Cursor, Copilot, Gemini, Kimi).",
+  "license": "MIT",
+  "homepage": "https://github.com/OWNER/arch-skills",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/OWNER/arch-skills.git"
+  },
+  "keywords": [
+    "architecture",
+    "documentation",
+    "drift",
+    "architecture-review",
+    "refactoring",
+    "skills",
+    "agent-skills",
+    "spec-driven-development",
+    "claude-code",
+    "codex"
+  ],
+  "skills": "./skills/",
+  "files": [
+    "skills",
+    ".claude-plugin",
+    ".codex-plugin",
+    ".cursor-plugin",
+    ".kimi-plugin",
+    "README.md",
+    "LICENSE"
+  ]
+}

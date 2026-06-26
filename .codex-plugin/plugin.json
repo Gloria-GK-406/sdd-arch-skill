@@ -1,0 +1,10 @@
+{
+  "name": "arch-skills",
+  "version": "0.1.0",
+  "description": "Isomorphic architecture-intent documentation and architecture-level review. Build/update/elicit/review atoms, WHAT- and WHY-side orchestrators, and a spec-driven-development conductor, to detect and prevent architectural drift early.",
+  "homepage": "https://github.com/OWNER/arch-skills",
+  "repository": "https://github.com/OWNER/arch-skills",
+  "license": "MIT",
+  "keywords": ["architecture", "documentation", "drift", "architecture-review", "refactoring", "skills", "agent-skills", "spec-driven-development"],
+  "skills": "./skills/"
+}
