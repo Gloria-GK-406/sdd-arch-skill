@@ -1,6 +1,6 @@
 ---
 name: arch-spec-flow
-description: Use when doing spec-driven development (writing or executing a spec, e.g. a brainstorm→spec→plan→execute→review flow) in a project that maintains architecture-intent documents (an arch-docs-conventions tree, by default under docs/architecture/). Applies whether or not such documents already exist for the area being changed.
+description: Use when entering or running any spec-driven development flow (e.g. brainstorm→spec→plan→execute→review). Fire regardless of repo or monorepo subproject, which area / plane / subsystem the change touches, or whether architecture-intent documents already exist there. Absence of docs in an area is a case this skill handles, never a reason to skip it.
 ---
 
 # arch-spec-flow · Weave architecture intent into the spec-driven loop
@@ -13,7 +13,7 @@ Spec-driven development (SDD) already has a shape: design → spec → plan → 
 
 ## When to use
 
-- The main agent is running any spec-driven flow (writing a spec, or executing one to landing) in a repo that keeps an architecture-intent tree.
+- The main agent is running any spec-driven flow (writing a spec, or executing one to landing) — in **any repo or monorepo subproject**, **whether or not an architecture-intent tree already exists in the area being changed**. If none exists there yet, touchpoint B bootstraps it from the landed code; absence of docs is never a reason to skip this skill. (In a monorepo, "project A has docs, project B doesn't" does **not** exempt B — per-subproject doc state is irrelevant to whether this skill fires.)
 - Invoke it **once at spec finalization** (touchpoint A) and **once the implementation has landed and its tests / review pass**, *before* the branch's wrap-up — i.e. before the host flow offers any merge / PR / integration choice (touchpoint B). Touchpoint B is a **post-landing check gate**, not a step inside the merge decision: it runs **first** and the integration decision waits behind it.
 
 **Do not use for**: a non-spec, one-off change with no spec artifact (run `arch-spec-review` directly if you want an architecture check); editing documents ahead of code (forbidden — see the iron principle).
