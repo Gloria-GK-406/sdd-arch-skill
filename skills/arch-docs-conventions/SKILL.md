@@ -14,7 +14,7 @@ This skill is the group's **entry point and home of the shared conventions**. It
 ## Shared dependencies (hosted here)
 
 - **`assets/template.md`** — the fill-in template for an architecture document. Every unit (overview or component) uses the same skeleton, so the tree is isomorphic.
-- **`references/intent-contract.md`** — the machine-readable conventions: the writing and parsing rules for boundaries, strength markers, ids, `⏳`, seams, code pointers, the completeness gate, the conflict artifact, and the document-language default. `arch-doc-build`/`arch-doc-update` write per this contract; `arch-why-elicit` clears `⏳` per it; `arch-spec-review`/`arch-doc-orchestrate` parse per it.
+- **`references/intent-contract.md`** — the machine-readable conventions: the writing and parsing rules for boundaries, strength markers, ids, `⏳`, seams, code pointers, the completeness gate, the conflict artifact, and the document-language default. `arch-doc-build`/`arch-doc-update` write per this contract; `arch-why-elicit` clears `⏳` per it; `arch-spec-review`/`arch-doc-reconcile`/`arch-doc-orchestrate` parse per it.
 
 Other skills reference these as `../arch-docs-conventions/assets/template.md` and `../arch-docs-conventions/references/intent-contract.md`.
 
@@ -26,7 +26,8 @@ Other skills reference these as `../arch-docs-conventions/assets/template.md` an
 | `arch-doc-build` | whether it exists | if absent, fill WHAT from scratch; leave every marker `⏳` |
 | `arch-doc-update` | whether it changed | if changed, minimal patch; preserve human WHY; new points `⏳`; delete what the code deleted |
 | `arch-why-elicit` | why | elicit WHY by questioning + bidirectional code grounding; the only skill that clears `⏳`; asks/records/verifies, never invents |
-| `arch-spec-review` | whether it conforms | architecture-level subtraction on a landed spec; makes no architectural decisions; gated on a `⏳`-free document |
+| `arch-spec-review` | whether it conforms | read-only compliance check on a landed spec; reports drift as conflict artifacts + reconciliation signals; changes nothing, decides nothing; gated on a `⏳`-free document |
+| `arch-doc-reconcile` | what the doc change should be | identify code↔document divergence and produce a **suggestion report** (which doc change + which atom fits); read-only — writes nothing, dispatches nothing, decides nothing |
 
 **Orchestrators (conduct, do no work themselves):**
 | skill | function | parallelism |
@@ -50,10 +51,13 @@ Project level: arch-doc-orchestrate (parallel build/update → whole WHAT tree, 
         ▼
    Document tree ⏳-free (WHAT + WHY complete)
         │
-Spec landed ──────────▶ arch-spec-review (completeness gate: must be ⏳-free, else halt) → architecture-level subtraction
-                            │ if an architectural change is introduced
+Spec landed ──────────▶ arch-spec-review (completeness gate: must be ⏳-free, else halt) → read-only compliance report
+                            │ findings (conflict artifacts + reconciliation signals)
                             ▼
-                         arch-doc-update (minimal patch; new/drifted points are ⏳ again) ──▶ back to arch-why-elicit / arch-why-orchestrate
+                         arch-doc-reconcile (suggest doc changes; read-only report, writes nothing)
+                            │ human adopts suggestions
+                            ▼
+                         arch-doc-update / arch-doc-build (minimal patch / build; new/drifted points are ⏳ again) ──▶ back to arch-why-elicit / arch-why-orchestrate
 ```
 
 ## Why build and update are separate

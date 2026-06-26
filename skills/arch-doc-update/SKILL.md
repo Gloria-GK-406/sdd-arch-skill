@@ -1,6 +1,6 @@
 ---
 name: arch-doc-update
-description: Use when a unit of an existing architecture document has changed architecturally due to an implementation change and the document must be reconciled against the new code; or when triggered after arch-spec-review determines a spec introduces an architectural change, or when dispatched by arch-doc-orchestrate to update a unit on the tree that already has a document but whose code has changed.
+description: Use when a unit of an existing architecture document has changed architecturally due to an implementation change and the document must be reconciled against the new code; or when the spec flow runs an update after a developer adopts an arch-doc-reconcile suggestion, or when dispatched by arch-doc-orchestrate to update a unit on the tree that already has a document but whose code has changed.
 ---
 
 # arch-doc-update · Architecture document update
@@ -15,7 +15,7 @@ Given an **existing document** plus **changed code**, perform a **minimal-patch*
 
 ## When to use
 
-- After `arch-spec-review` determines a spec introduces an architectural change.
+- When the spec flow runs an update after a developer **adopts** an `arch-doc-reconcile` suggestion (reconcile only suggests — it does not dispatch you; the flow runs you on the adopted change).
 - When dispatched by `arch-doc-orchestrate` to update a unit on the tree that already has a document but whose code has changed.
 
 **Do not use for**: a document that does not exist (use `arch-doc-build`); filling in WHY (use `arch-why-elicit`); reviewing a spec (use `arch-spec-review`).

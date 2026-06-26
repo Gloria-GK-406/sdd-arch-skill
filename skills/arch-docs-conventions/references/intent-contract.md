@@ -1,7 +1,7 @@
 # intent-contract · machine-readable conventions for architecture documents
 
 > `arch-doc-build` / `arch-doc-update` **produce** documents per this contract; `arch-why-elicit` **clears ⏳** per this contract;
-> `arch-spec-review` / `arch-doc-orchestrate` **parse** documents per this contract.
+> `arch-spec-review` / `arch-doc-orchestrate` / `arch-doc-reconcile` **parse** documents per this contract (`arch-doc-reconcile` parses the documents against the code to produce a suggestion report).
 > This is the interface contract between the WHAT writer, the WHY filler, and the review/orchestration consumers.
 
 ---
@@ -189,9 +189,9 @@ When review/orchestrate encounters an item with `enforced_by`, it **runs that ch
 
 ---
 
-## Upgrade / conflict artifact (shared by rationale and review)
+## Upgrade / conflict artifact (shared by rationale, review, and reconcile)
 
-`arch-why-elicit` (when it finds a human-given rationale contradicts the code) and `arch-spec-review` (when it halts and hands off to a human) produce **the same-shaped** artifact:
+`arch-why-elicit` (when it finds a human-given rationale contradicts the code) and `arch-spec-review` (when a compliance finding must be handed to a human) produce **the same-shaped** artifact; `arch-doc-reconcile` **consumes** it as one input to its suggestion report:
 
 ```
 {
@@ -212,4 +212,4 @@ When review/orchestrate encounters an item with `enforced_by`, it **runs that ch
 **Cross-section same-symbol drift** (a separate axis): drift of one code symbol (e.g. `runTask`→`runEpisode`) may simultaneously hit **multiple sections' WHY blocks**. Each WHY block is an **independent slot**, handled independently (update demotes each to `⏳` + marks; why-elicit re-reviews each) — **do not mark/migrate only one place**. This is distinct from "splitting use within a single rationale" above.
 
 - `arch-why-elicit` on conflict **does not clear ⏳**; it emits this artifact for the human to decide (change the code? or was the original intent wrong?).
-- `arch-spec-review` with large deviation → judges the spec design a failure → **redesigns the spec with the artifact** (rather than blindly rerunning); the same architectural conflict recurring → judges it an architectural problem and escalates to changing the 🧱.
+- `arch-spec-review` **reports** the artifact and does not act on it: it surfaces drift, flags a **large deviation** or a **recurring** architectural conflict as severity signals, but makes no change and takes no architecture decision. The disposition the artifact invites — redesign the spec, escalate to changing the 🧱, or reconcile the documents — is decided **downstream** by the human. `arch-doc-reconcile` turns the artifact into **suggested** document changes (a read-only report); the human adopts them, and `arch-doc-update` / `arch-doc-build` carry them out.

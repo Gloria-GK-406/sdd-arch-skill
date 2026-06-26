@@ -53,7 +53,8 @@ Codex auto-discovers every subdirectory that contains a `SKILL.md`.
 | **`arch-doc-build`** | build WHAT | whether a document exists — if absent, fill WHAT from scratch and leave every marker as `⏳` |
 | **`arch-doc-update`** | update WHAT | whether the code changed — apply a **minimal patch**, **preserve human-written WHY**, mark new points `⏳` |
 | **`arch-why-elicit`** | fill WHY | elicit rationale by **questioning** the human + ground it **bidirectionally** against code; the **only** skill that clears `⏳`; only asks, records, verifies — never invents |
-| **`arch-spec-review`** | review | hold a landed change to the recorded intent; surface drift across marked boundaries; makes no architecture decisions; gated by a completeness gate up front |
+| **`arch-spec-review`** | review | **read-only** compliance check: hold a landed change to the recorded intent and **report** drift across marked boundaries as conflict artifacts + reconciliation signals; changes nothing, decides nothing; gated by a completeness gate up front |
+| **`arch-doc-reconcile`** | suggest doc changes | identify where the documents diverge from landed code and produce a **suggestion report** (which change + which atom fits); **read-only** — writes nothing, dispatches nothing; a human adopts the suggestions, then `arch-doc-update` / `arch-doc-build` carry them out |
 | **`arch-doc-orchestrate`** | WHAT-tree orchestration | recursively **dispatch subagents** along the overview's drill-down sections to build/refresh the whole WHAT tree — **parallel fan-out** |
 | **`arch-why-orchestrate`** | WHY orchestration | scan the tree for `⏳`, order them (foundations first), drive `arch-why-elicit` to **interview the human**, cross-check rationale consistency — **sequential, human-in-the-loop** |
 | **`arch-spec-flow`** | SDD conductor | weave the two architecture touchpoints into a spec-driven flow: declare boundary-crossing intent in the spec up front, reconcile documents from landed code at branch wrap-up |
@@ -71,7 +72,7 @@ Codex auto-discovers every subdirectory that contains a `SKILL.md`.
 They have **opposite disciplines**: `build` is a generative "fill the blanks" operation, while `update` is conservative "reconcile + minimal patch + preserve human WHY". Merging them puts two conflicting instruction sets in context at once and drifts at runtime; under an additive bias, a merged skill tends to degenerate into "regenerate" and overwrite the human-written WHY. Split, each skill has a single, non-conflicting goal — the most stable shape for an LLM.
 
 ### Documents trail code; review is the backstop
-Documents record the architecture **as it is now** — no history, no process notes. A document is only ever written or updated **from landed code**, never ahead of it. Review uses a **strict completeness gate**: every document it consumes must be entirely `⏳`-free, or it halts — a forcing function against cut corners and stale documents. The whole set is **script-free and agent-enforced**; only the optional `enforced_by` hook is a per-item deterministic safeguard (attached only when a real static/dynamic check exists).
+Documents record the architecture **as it is now** — no history, no process notes. A document is only ever written or updated **from landed code**, never ahead of it. Review uses a **strict completeness gate**: every document it consumes must be entirely `⏳`-free, or it halts — a forcing function against cut corners and stale documents. Review is **read-only** — it checks and reports, but changes nothing. Deciding *what* document change a finding warrants is `arch-doc-reconcile`'s job — also **read-only**, it produces a **suggestion report**; a human adopts the suggestions, and `arch-doc-update` / `arch-doc-build` carry them out. The whole set is **script-free and agent-enforced**; only the optional `enforced_by` hook is a per-item deterministic safeguard (attached only when a real static/dynamic check exists).
 
 ## Closed loop
 
@@ -84,8 +85,9 @@ Project bootstrap:  arch-doc-orchestrate  (fan out build/update → whole WHAT t
 
 Per spec (SDD), via arch-spec-flow:
    spec finalization ─▶ declare any boundary-crossing intent IN THE SPEC (doc-path + INV-id)
-   code lands        ─▶ arch-spec-review  (completeness gate → drift / consistency check against the declaration)
-   branch wrap-up    ─▶ arch-doc-update / arch-doc-build reconcile docs FROM LANDED CODE → arch-why-elicit fills new ⏳
+   code lands        ─▶ arch-spec-review  (completeness gate → drift / consistency check against the declaration; read-only report)
+   branch wrap-up    ─▶ arch-doc-reconcile suggests doc changes → human adopts → arch-doc-update / arch-doc-build write FROM LANDED CODE → arch-why-elicit fills new ⏳
+                        (review + reconcile are read-only, run on the best model)
    merge             ─▶ only after documents are reconciled
 ```
 
@@ -93,9 +95,9 @@ Per spec (SDD), via arch-spec-flow:
 
 ```
 sdd-arch-skill/
-├── skills/                       # the 8 skills (this is what gets installed)
+├── skills/                       # the 9 skills (this is what gets installed)
 │   ├── arch-docs-conventions/    # shared home: assets/template.md + references/intent-contract.md
-│   ├── arch-doc-build/  ·  arch-doc-update/  ·  arch-why-elicit/  ·  arch-spec-review/
+│   ├── arch-doc-build/  ·  arch-doc-update/  ·  arch-why-elicit/  ·  arch-spec-review/  ·  arch-doc-reconcile/
 │   ├── arch-doc-orchestrate/  ·  arch-why-orchestrate/  ·  arch-spec-flow/
 ├── .claude-plugin/   .codex-plugin/   .cursor-plugin/   .kimi-plugin/   # per-runtime manifests
 ├── package.json   LICENSE   README.md

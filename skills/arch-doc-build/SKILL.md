@@ -1,6 +1,6 @@
 ---
 name: arch-doc-build
-description: Use when a code unit (service / component / overview level) has no architecture document yet and one must be built from scratch; or when arch-doc-orchestrate dispatches you to build a document for a unit on the tree that has no document yet.
+description: Use when a code unit (service / component / overview level) has no architecture document yet and one must be built from scratch; or when the spec flow runs a build after a developer adopts an arch-doc-reconcile suggestion for a footprint with no document yet, or when arch-doc-orchestrate dispatches you to build a document for a unit on the tree that has no document yet.
 ---
 
 # arch-doc-build · Architecture document construction
@@ -14,6 +14,7 @@ Core principle: fill in only the WHAT (structural facts); leave WHY as `⏳` alw
 ## When to use
 
 - Build an architecture document that does not yet exist for a unit (overview level or component level).
+- When the spec flow runs a build after a developer **adopts** an `arch-doc-reconcile` suggestion for a footprint with no document yet (reconcile only suggests — it does not dispatch you; the flow runs you on the adopted change).
 - When dispatched by `arch-doc-orchestrate` to build a document for a unit on the tree that has no document yet.
 
 Do not use for: a document that already exists (use `arch-doc-update`); filling in WHY (use `arch-why-elicit`); reviewing a landed spec (use `arch-spec-review`).
