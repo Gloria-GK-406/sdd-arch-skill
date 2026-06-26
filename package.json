@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "description": "Isomorphic architecture-intent documentation and architecture-level review skill group for coding agents (Claude Code, Codex, Cursor, Copilot, Gemini, Kimi).",
   "license": "MIT",
-  "homepage": "https://github.com/OWNER/arch-skills",
+  "homepage": "https://github.com/Gloria-GK-406/sdd-arch-skill",
   "repository": {
     "type": "git",
-    "url": "https://github.com/OWNER/arch-skills.git"
+    "url": "https://github.com/Gloria-GK-406/sdd-arch-skill.git"
   },
   "keywords": [
     "architecture",

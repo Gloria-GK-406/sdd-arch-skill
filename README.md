@@ -16,11 +16,11 @@ Works across agents that read the Agent Skills format: **Claude Code, Codex, Cur
 
 ```bash
 # install the whole group globally for Codex + Claude Code
-npx skills add OWNER/arch-skills -a codex -a claude-code -g --all
+npx skills add Gloria-GK-406/sdd-arch-skill -a codex -a claude-code -g --all
 
 # other useful commands
-npx skills list                 # what's installed
-npx skills remove arch-skills   # uninstall
+npx skills list                    # what's installed
+npx skills remove sdd-arch-skill   # uninstall
 ```
 
 - Add `--copy` to copy files instead of symlinking (use this if your agent doesn't follow symlinks — a known case for Claude Code).
@@ -29,7 +29,7 @@ npx skills remove arch-skills   # uninstall
 ### Claude Code — native plugin / marketplace
 
 ```text
-/plugin marketplace add OWNER/arch-skills
+/plugin marketplace add Gloria-GK-406/sdd-arch-skill
 /plugin install arch-skills@arch-skills-dev
 ```
 
@@ -92,7 +92,7 @@ Per spec (SDD), via arch-spec-flow:
 ## Repository layout
 
 ```
-arch-skills/
+sdd-arch-skill/
 ├── skills/                       # the 8 skills (this is what gets installed)
 │   ├── arch-docs-conventions/    # shared home: assets/template.md + references/intent-contract.md
 │   ├── arch-doc-build/  ·  arch-doc-update/  ·  arch-why-elicit/  ·  arch-spec-review/
