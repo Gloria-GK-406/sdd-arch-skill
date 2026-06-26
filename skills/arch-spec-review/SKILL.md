@@ -1,6 +1,6 @@
 ---
 name: arch-spec-review
-description: Use when a spec has landed (code is written) and, before merge, you must check the change against the recorded architecture intent for drift across marked boundaries. Precondition: every consumed architecture document must be ⏳-free, else halt for arch-why-elicit first.
+description: Use when a spec has landed (code is written) and, before merge, you must check the change against the recorded architecture intent for drift across marked boundaries. Precondition — every consumed architecture document must be ⏳-free, else halt for arch-why-elicit first.
 ---
 
 # arch-spec-review · Architecture-level review of a landed spec
