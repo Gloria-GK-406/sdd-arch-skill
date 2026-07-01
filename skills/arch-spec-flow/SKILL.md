@@ -1,20 +1,25 @@
 ---
 name: arch-spec-flow
-description: Use when entering or running any spec-driven development flow (e.g. brainstorm→spec→plan→execute→review). Fire regardless of repo or monorepo subproject, which area / plane / subsystem the change touches, or whether architecture-intent documents already exist there. Absence of docs in an area is a case this skill handles, never a reason to skip it.
+description: Use when entering or running any spec-driven development flow (e.g. brainstorm→spec→plan→impl→review). Fire regardless of repo or monorepo subproject, which area / plane / subsystem the change touches, or whether architecture-intent documents already exist there. Absence of docs in an area is a case this skill handles, never a reason to skip it.
 ---
+
+<SUBAGENT-STOP>
+If you are a subagent, ignore this skill's requirements. This is a conductor skill
+for the main agent only; continue with the task you were explicitly dispatched to do.
+</SUBAGENT-STOP>
 
 # arch-spec-flow · Weave architecture intent into the spec-driven loop
 
 ## Overview
 
-Spec-driven development (SDD) already has a shape: design → spec → plan → execute → review → merge. This skill adds **two architecture touchpoints** to that shape — one at spec finalization, one at branch wrap-up — and **dispatches the existing `arch-skills` at the right moments**. You are the conductor that splices the architecture steps into whatever SDD flow the main agent is running; the actual work is delegated to `arch-spec-review` / `arch-doc-reconcile` / `arch-doc-update` / `arch-doc-build` / `arch-why-elicit`.
+Spec-driven development (SDD) already has a shape: design → spec → plan → impl → review → merge. This skill pins architecture work to **two explicit SDD phases**. During the **spec phase**, the main agent reads the recorded architecture intent and records any deliberate boundary crossing in the spec. During the **implementation phase**, after code has landed and tests / review pass, architecture review + document reconciliation run as the **final implementation step** before branch wrap-up / integration begins. You are the conductor that fits those phase steps into whatever SDD flow the main agent is running; the actual work is delegated to `arch-spec-review` / `arch-doc-reconcile` / `arch-doc-update` / `arch-doc-build` / `arch-why-elicit`.
 
-**One iron principle governs everything**: **documents strictly trail code; they never lead it.** Design-time intent — including the intent to *cross* a recorded architecture boundary — lives in the **spec**, never prematurely in a document. A document is only ever written or updated **from landed code**, as the last step on the branch, so every documented statement stays grounded in real code. This is why there is a front touchpoint (declare intent in the spec) and a back touchpoint (reconcile the document from the landed code) rather than one doc-editing step in the middle.
+**One iron principle governs everything**: **documents strictly trail code; they never lead it.** Design-time intent — including the intent to *cross* a recorded architecture boundary — lives in the **spec**, never prematurely in a document. A document is only ever written or updated **from landed code**, as the final implementation step on the branch, so every documented statement stays grounded in real code. This is why the spec-phase step declares intent in the spec, and the implementation-final step reconciles the document from landed code, rather than editing documents in the middle.
 
 ## When to use
 
-- The main agent is running any spec-driven flow (writing a spec, or executing one to landing) — in **any repo or monorepo subproject**, **whether or not an architecture-intent tree already exists in the area being changed**. If none exists there yet, touchpoint B bootstraps it from the landed code; absence of docs is never a reason to skip this skill. (In a monorepo, "project A has docs, project B doesn't" does **not** exempt B — per-subproject doc state is irrelevant to whether this skill fires.)
-- Invoke it **once at spec finalization** (touchpoint A) and **once the implementation has landed and its tests / review pass**, *before* the branch's wrap-up — i.e. before the host flow offers any merge / PR / integration choice (touchpoint B). Touchpoint B is a **post-landing check gate**, not a step inside the merge decision: it runs **first** and the integration decision waits behind it.
+- The main agent is running any spec-driven flow (writing a spec, or executing one to landing) — in **any repo or monorepo subproject**, **whether or not an architecture-intent tree already exists in the area being changed**. If none exists there yet, the implementation-final architecture step bootstraps it from the landed code; absence of docs is never a reason to skip this skill. (In a monorepo, "project alpha has docs, project beta doesn't" does **not** exempt beta — per-subproject doc state is irrelevant to whether this skill fires.)
+- Run the spec-phase instructions **during the SDD spec phase**, before code is written. Run the implementation-phase architecture gate **after implementation code has landed and its tests / review pass**, as the **final step of SDD implementation**, before the host flow offers any merge / PR / integration choice. The implementation-final step is a **post-landing check gate**, not a step inside the merge decision: implementation is not complete until it clears.
 
 **Do not use for**: a non-spec, one-off change with no spec artifact (run `arch-spec-review` directly if you want an architecture check); editing documents ahead of code (forbidden — see the iron principle).
 
@@ -23,19 +28,19 @@ Spec-driven development (SDD) already has a shape: design → spec → plan → 
 ```
 Documents trail code, never lead. No document is created or updated until the code it describes has landed.
 The intent to cross a boundary lives in the spec (declared with doc-path + INV-id), not in the document.
-The document is reconciled from landed code as the final step ON THE BRANCH — code merges with documents already updated, never after.
+The document is reconciled from landed code as the final implementation step ON THE BRANCH — code merges with documents already updated, never after.
 ```
 
-## The two touchpoints
+## Architecture steps by SDD phase
 
-### Touchpoint A — at spec finalization (before code is written)
+### Spec phase — declare architecture intent before code is written
 
 1. **Locate the footprint's documents** and load them as design aid: the architecture-intent documents covering the area this spec will change (resolve via `intent-contract` "Document location and naming"). Designing with the recorded intent in view is what prevents most accidental drift — do not skip it.
 2. **Classify the spec against the intent** (using the `intent-contract` conventions to parse markers/invariants):
-   - **Stays within intent** → no declaration needed; the back touchpoint will only need to record any genuinely new architectural surface.
+   - **Stays within intent** → no declaration needed; the implementation-final step will only need to record any genuinely new architectural surface.
    - **Deliberately crosses a marked boundary** (the spec's point is to move a `🧱/💡/🚧`) → **write an intent declaration into the spec** (format below). The architecture decision is the human's, made at **spec approval** — surfacing it here is what makes it conscious and reviewable.
-   - **No document covers the footprint at all** → note that documents will be **bootstrapped from landed code** at touchpoint B; declare nothing now.
-3. **Never touch a document in touchpoint A.** Intent goes into the spec only.
+   - **No document covers the footprint at all** → note that documents will be **bootstrapped from landed code** in the implementation-final step; declare nothing now.
+3. **Never touch a document during the spec phase.** Intent goes into the spec only.
 
 **Intent-declaration format** (a section in the spec; one block per crossing):
 ```
@@ -48,9 +53,9 @@ The document is reconciled from landed code as the final step ON THE BRANCH — 
 ```
 The **doc path + INV-id** is the precise anchor `arch-spec-review` uses to tell an *intended* crossing from an *accidental* one.
 
-### Touchpoint B — the moment code lands (implementation complete, tests green), before any merge / PR decision
+### Implementation phase final step — after code lands, before branch wrap-up
 
-> **This is a post-landing gate, not a step inside the merge decision.** It fires the instant the code is done and its tests / review pass — the same point at which the host flow would normally begin branch wrap-up. When the host flow is about to offer merge / PR / cleanup options, touchpoint B runs **first** and the integration decision waits behind it. If you are being asked *how* to merge before review + reconcile have run, the gate has already been skipped — back up and run it.
+> **This is the final step of SDD implementation, not a step inside the merge decision.** It fires after the code is done and its tests / review pass — the same point at which the host flow might otherwise consider implementation complete and begin branch wrap-up. Implementation is not complete until this architecture review + reconcile sequence clears. If you are being asked *how* to merge before review + reconcile have run, the implementation phase was closed too early — back up and run its final architecture step.
 
 1. **Dispatch `arch-spec-review`** (read-only compliance check), giving it as material: the diff, the relevant architecture documents, `intent-contract`, **and the spec document itself** (you know where this SDD flow keeps specs — pass that path; review does not go looking for it). The spec's intent declaration lets review run its consistency check (declared crossings realized? nothing undeclared crossed?). Review **changes nothing**; it returns a report — conflict artifacts for violations, reconciliation signals for compliant-but-document-affecting changes.
 2. **Resolve review's violations** before reconciling: undeclared violations / inconsistencies → fix code or escalate per the conflict artifacts; a large deviation flagged by review → redesign the spec with the artifacts (do not blind-rerun). Re-review after a code fix.
@@ -64,12 +69,12 @@ The **doc path + INV-id** is the precise anchor `arch-spec-review` uses to tell 
 
 ## Routing (footprint × intent), in one place
 
-| Footprint has docs? | Spec's relation to intent | Touchpoint A | Touchpoint B (review → reconcile) |
+| Footprint has docs? | Spec's relation to intent | Spec phase | Implementation final step (review → reconcile) |
 |---|---|---|---|
 | yes | stays within intent | nothing to declare | review reports → `arch-doc-reconcile` suggests an update only if new architectural surface appeared → author adopts → `arch-doc-update` → `arch-why-elicit` |
 | yes | deliberately crosses | declare crossing (doc-path + INV-id) | review consistency-checks the declaration → `arch-doc-reconcile` suggests the boundary move → author adopts (settles the decision) → `arch-doc-update` from landed code → `arch-why-elicit` |
 | yes | accidentally crosses (caught designing) | redesign so it doesn't cross | — |
-| no | (any) | note "bootstrap at B" | review reports → `arch-doc-reconcile` suggests a build → author adopts → `arch-doc-build` from landed code → `arch-why-elicit` |
+| no | (any) | note "bootstrap in implementation final step" | review reports → `arch-doc-reconcile` suggests a build → author adopts → `arch-doc-build` from landed code → `arch-why-elicit` |
 
 ## Dispatching the review and reconcile subagents
 
@@ -82,7 +87,7 @@ The **doc path + INV-id** is the precise anchor `arch-spec-review` uses to tell 
 
 - Editing or creating an architecture document **before** the code it describes has landed (violates the iron principle — intent belongs in the spec until then).
 - A spec that crosses a marked boundary but carries **no intent declaration** (the crossing will read as accidental drift, correctly — but the author should have declared it; surface this).
-- The host flow's branch wrap-up / integration step presenting merge / PR / cleanup options **before** touchpoint B has run. Touchpoint B fires on "code landed + tests / review pass" and the integration decision waits behind it — being asked *how* to merge before review + reconcile ran means the gate was mis-ordered; back up.
+- The host flow's branch wrap-up / integration step presenting merge / PR / cleanup options **before** the implementation-final architecture step has run. That step fires on "code landed + tests / review pass", and implementation is not complete until it clears — being asked *how* to merge before review + reconcile ran means the SDD phases were mis-ordered; back up.
 - Reaching merge with documents not yet reconciled to the landed code.
 - Treating reconcile's suggestion report as applied work — it only suggests; the documents are written by `arch-doc-update` / `arch-doc-build` after the author adopts.
 - Letting `arch-doc-reconcile` (or `arch-spec-review`) edit a document or dispatch an atom — both are read-only.
@@ -91,8 +96,8 @@ The **doc path + INV-id** is the precise anchor `arch-spec-review` uses to tell 
 
 ## Self-check
 
-- [ ] Touchpoint A ran at spec finalization: footprint docs loaded as aid; every deliberate boundary crossing declared in the spec with doc-path + INV-id; no document touched
-- [ ] Touchpoint B ran **the moment code landed (tests green), before any merge / PR option was offered**: `arch-spec-review` dispatched **with the spec document** as material; violations resolved
+- [ ] Spec-phase architecture step ran during the SDD spec phase: footprint docs loaded as aid; every deliberate boundary crossing declared in the spec with doc-path + INV-id; no document touched
+- [ ] Implementation-final architecture step ran **after code landed (tests green) as the last step of SDD implementation, before any merge / PR option was offered**: `arch-spec-review` dispatched **with the spec document** as material; violations resolved
 - [ ] `arch-doc-reconcile` dispatched with review's report; it returned a **suggestion report** and edited nothing; suggestions relayed to the author and **adopted** before any document was written
 - [ ] Review and reconcile both ran on the best available subagent / model
 - [ ] Documents reconciled **from landed code** by `arch-doc-update` / `arch-doc-build` on the adopted suggestions, every fresh `⏳` cleared by `arch-why-elicit` on-branch
@@ -101,7 +106,7 @@ The **doc path + INV-id** is the precise anchor `arch-spec-review` uses to tell 
 
 ## Dependencies / integration
 
-- **Front (declaration)**: parses documents per `../arch-docs-conventions/references/intent-contract.md`.
-- **Back (review + reconcile)**: dispatches `arch-spec-review` (with the spec) and `arch-doc-reconcile` — both read-only, both on the best available model — then relays reconcile's suggestions to the author, runs `arch-doc-update` / `arch-doc-build` on the adopted ones, and `arch-why-elicit` on the fresh `⏳`.
+- **Spec phase (declaration)**: parses documents per `../arch-docs-conventions/references/intent-contract.md`.
+- **Implementation final step (review + reconcile)**: dispatches `arch-spec-review` (with the spec) and `arch-doc-reconcile` — both read-only, both on the best available model — then relays reconcile's suggestions to the author, runs `arch-doc-update` / `arch-doc-build` on the adopted ones, and `arch-why-elicit` on the fresh `⏳`.
 - **Tree-scale variants**: for a whole subsystem rather than one spec, the build/update side may run via `arch-doc-orchestrate` and the WHY side via `arch-why-orchestrate`.
-- **Host flow**: this skill is an **add-on** to the project's existing spec-driven flow (e.g. `superpowers:writing-plans` / `superpowers:executing-plans` / `superpowers:finishing-a-development-branch`); it does not replace it. Touchpoint B **precedes** the host's branch wrap-up / integration step: it triggers when the implementation has landed and tests / review pass, and must clear **before** that step offers merge / PR / cleanup — the host's merge prompt fires only once touchpoint B has passed.
+- **Host flow**: this skill is an **add-on** to the project's existing spec-driven flow (e.g. `superpowers:writing-plans` / `superpowers:executing-plans` / `superpowers:finishing-a-development-branch`); it does not replace it. The implementation-final architecture step belongs to the host flow's implementation phase: it triggers when implementation has landed and tests / review pass, and must clear **before** branch wrap-up offers merge / PR / cleanup — the host's merge prompt fires only once implementation is complete.
