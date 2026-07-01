@@ -34,7 +34,7 @@ Existing ids never change; never regenerate, never renumber, never assign streng
 3. **Preserve human-written WHY**: do **not touch a single word** of filled-in why blocks (unless "anchor drift" below is triggered → even then only **mark**, do not rewrite).
 4. **Mark new/changed decision points with `⏳`**: mint a **new** id for a newly appearing boundary (`INV-<unit>-<slug>`, reusing this document's `<unit>`), set the strength slot to `⏳`; write `⏳ pending` for a newly added why block.
 5. **Stable ids + deletion is deletion**: existing invariants **keep their original id** (even when the statement is reworded); new boundaries get new ids; **for a constraint the code removed, delete the boundary line together with its id, leaving no tombstone and no comment residue** — the document records the present, history belongs to git.
-6. **Sync drill-down pointers**: a new subcomponent → add a line (dedicated doc `to write`); a removed one → **delete the line**; rename/migration → update the pointer and align `<unit>`.
+6. **Sync drill-down pointers**: a new subcomponent → add a line (dedicated doc `to-be-written`); a removed one → **delete the line**; rename/migration → update the pointer and align `<unit>`.
 7. **Run the self-check** (see end).
 
 ## Key judgments

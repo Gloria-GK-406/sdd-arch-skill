@@ -77,7 +77,7 @@ When multiple agents each run independently, a closing pass is required to preve
 
 - Every drill-down section pointer resolves to a real child document, and the child's `<unit>` aligns with the pointer.
 - Each child document is pointed to by exactly one parent (no orphans, no double-parents).
-- **Cross-unit deduplication**: If multiple drill-down sections point to the same sub-component, merge them into one document and change the rest into references.
+- **Cross-unit ownership**: If multiple drill-down sections point to the same sub-component, treat it as a stitch conflict. Choose one owning parent for the child document and demote the other drill-down rows to `—` or restructure the rows so each child document has exactly one parent; do not invent a reference pointer state.
 
 ## Output
 

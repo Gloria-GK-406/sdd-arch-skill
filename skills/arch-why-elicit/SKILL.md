@@ -30,7 +30,7 @@ Grounding fails / there is a conflict → leave ⏳ or produce a conflict artifa
 
 ## Workflow
 
-1. **Scan out all `⏳` slots**: two kinds — item-level (the strength-marker slot of each atomic boundary) and block-level (the block-header strength of each `> Why built this way`).
+1. **Scan out all `⏳` slots**: two kinds — item-level (the strength-marker slot of each atomic boundary) and block-level (the block-header strength of each `> **Rationale** <strength>` block).
 2. **Generate a code-anchored question per slot** and ask the human (see "How to ask" below), focusing on one decision at a time.
 3. **On receiving the human's answer, cross-check via bidirectional grounding** (see the two directions below).
 4. **Choose one of three outcomes**:

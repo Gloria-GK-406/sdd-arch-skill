@@ -85,7 +85,7 @@ Follow the rigid conventions of `template.md` (delete the template's filling gui
 - WHY goes into a blockquote, format `> **Rationale** <strength>`, **must carry a strength marker**
 - The preamble declares this unit's **`<unit>` code** (see §4), in the format below
 
-**Preamble `<unit>` declaration**: **on its own line, immediately after the preamble's ① perspective-layer block and before ② signal strength**:
+**Preamble `<unit>` declaration**: **on its own line, immediately after the preamble's ① Viewpoint level block and before ② Signal strength**:
 ```
 > **Unit code**: `exec`
 ```

@@ -16,7 +16,7 @@ The skill's entire output is the report. It **modifies nothing** — no document
 ## When to use
 
 - After a change lands in some scope and the documents may lag the code — to get a concrete, reviewable list of suggested document changes before anyone edits a document.
-- In `arch-spec-flow` touchpoint B, after `arch-spec-review`, to turn the code↔document divergence into adoptable suggestions.
+- In `arch-spec-flow` touchpoint B, after `arch-spec-review` or an explicit no-doc/no-review note, to turn the code↔document divergence into adoptable suggestions.
 
 **Do not use for**: writing the documents (`arch-doc-build` / `arch-doc-update`), the compliance check (`arch-spec-review`), filling WHY (`arch-why-elicit`), or batch-building a whole WHAT tree (`arch-doc-orchestrate`).
 
@@ -31,7 +31,7 @@ WHY and strength markers are never written — a suggested new point is noted as
 
 ## Workflow
 
-1. **Ingest**: read the changed code/diff in the scope, the current architecture documents covering that scope (resolve via `intent-contract` "Document location and naming"), `intent-contract` itself, and — when provided — the spec (its declarations classify expected vs unexpected inconsistency) and `arch-spec-review`'s report (strong leads, not a substitute for your own reading).
+1. **Ingest**: read the changed code/diff in the scope, the current architecture documents covering that scope, if any (resolve via `intent-contract` "Document location and naming"), `intent-contract` itself, and — when provided — the spec (its declarations classify expected vs unexpected inconsistency), `arch-spec-review`'s report (strong leads, not a substitute for your own reading), or an explicit no-doc/no-review note from `arch-spec-flow`.
 2. **Detect divergence** across the scope — the five kinds below, judged per constraint point and per document-tree placement.
 3. **Classify each divergence into a suggestion** — the five kinds below — naming the target document/section and the atom(s) that fit.
 4. **Handle inconsistencies (detection 2) by spec**: with a spec, label each as **expected** (the spec declared it, by doc-path + INV-id → suggest the update) or **unexpected** (not declared → surface it and flag it for the human, do not blindly suggest editing the document to match the code). Without a spec, surface every inconsistency without judging intended-vs-accidental.
@@ -40,11 +40,11 @@ WHY and strength markers are never written — a suggested new point is noted as
 
 ## Detection — the five divergences
 
-Judged within the change scope, against the current documents:
+Judged within the change scope, against the current documents or their absence:
 
 1. **Vanished constraint** — the document records an `INV-…` the landed code no longer enforces (the constraint was removed).
 2. **Inconsistent constraint** — the document records an `INV-…` but the landed code contradicts its statement (implementation ≠ recorded constraint). A sub-flavor is **anchor drift**: the constraint's core still holds but the WHAT symbol/structure it names moved with the code.
-3. **Unrecorded constraint** — the landed code enforces an architecturally meaningful constraint the documents never recorded. **Sub-judgment**: does it belong **under an existing document** (a new invariant in a unit that already has a document), or does it **warrant a new document** (an uncovered footprint / a unit with no document)? Apply the same granularity test as build (`intent-contract` §5 — self-contained, independent rate of change, complex enough to need its own isomorphic document).
+3. **Unrecorded constraint** — the landed code enforces an architecturally meaningful constraint the documents never recorded. This includes the explicit no covering docs case from `arch-spec-flow`: classify it as an uncovered footprint / unrecorded constraint. **Sub-judgment**: does it belong **under an existing document** (a new invariant in a unit that already has a document), or does it **warrant a new document** (an uncovered footprint / a unit with no document)? Apply the same granularity test as build (`intent-contract` §5 — self-contained, independent rate of change, complex enough to need its own isomorphic document).
 4. **Migrated constraint (whole-component)** — a component moved or was renamed at the component level, so the document's path no longer tracks the component's code path — **doc-path ↔ component-path drift**. The constraints' meaning is unchanged; their carrying document must move and the drill-down pointers re-align.
 5. **Split-out constraint** — a component grew until the portion of the current document carrying it has reached the threshold of its own isomorphic document (`intent-contract` §5 — a `—` row or an inline part now warrants `to-be-written` / its own file). The constraints must move out into a newly split file.
 
@@ -57,7 +57,7 @@ Each maps a divergence to a concrete document change, naming the atom that would
 | **Delete a constraint** | 1 vanished | remove the `INV-…` line together with its id (no tombstone) | `arch-doc-update` |
 | **Update a constraint** | 2 inconsistent | restate the invariant's statement / re-anchor it to match the landed code, **id stable**; if human WHY is anchored to the old statement, note that it drops to `⏳` for re-confirmation | `arch-doc-update` |
 | **Add a constraint** | 3 → under existing doc | add a new invariant (born `⏳`) into an existing document/section | `arch-doc-update` |
-| **Create a constraint** | 3 → needs new doc | create a **new document** that carries the new invariant (born `⏳`); the parent's drill-down pointer becomes a link | `arch-doc-build` (+ `arch-doc-update` on the parent) |
+| **Create a constraint** | 3 → needs new doc | create a **new document** that carries the new invariant (born `⏳`); the parent's drill-down pointer becomes a link if there is a parent | `arch-doc-build` (+ `arch-doc-update` on the parent, if any) |
 | **Migrate a constraint** | 4 component migration · 5 split-out | move the constraints (and/or their document) to track the code — for 4, move/rename the document to the new component path and re-align drill-down pointers; for 5, split the carrying portion into a new file and re-point the parent (`to-be-written` → link) | `arch-doc-update` (± `arch-doc-build` for the new file) |
 
 **Update is not delete-plus-add.** A diverged constraint whose identity persists is an **update** (id stable). Delete + add appear together only when a constraint genuinely **vanished** and a **different new** one appeared — two separate detections (1 and 3), not one inconsistency.
@@ -132,6 +132,6 @@ Use `suggestion: delete | update | add | create | migrate`. A create names the n
 
 ## Dependencies / integration
 
-- **Inputs**: the changed code/diff in scope · the architecture documents covering the scope · `../arch-docs-conventions/references/intent-contract.md` (divergence judged per its conventions — boundaries/ids §3, stable id §4, seam/drill-down and placement §5, footprint §6, anchor drift) · optionally the spec (classifies expected vs unexpected inconsistency) · optionally `arch-spec-review`'s report.
+- **Inputs**: the changed code/diff in scope · the architecture documents covering the scope, if any · `../arch-docs-conventions/references/intent-contract.md` (divergence judged per its conventions — boundaries/ids §3, stable id §4, seam/drill-down and placement §5, footprint §6, anchor drift) · optionally the spec (classifies expected vs unexpected inconsistency) · optionally `arch-spec-review`'s report or an explicit no-doc/no-review note.
 - **Consumed by**: the conductor / developer, who adopt suggestions and then run `arch-doc-update` / `arch-doc-build`; new `⏳` is filled by `arch-why-elicit`.
 - **Conductor**: `arch-spec-flow` runs this at touchpoint B and presents its suggestions to the developer.

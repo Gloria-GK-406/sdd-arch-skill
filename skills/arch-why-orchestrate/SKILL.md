@@ -7,11 +7,11 @@ description: Use when an architecture document tree has WHAT filled in but WHY s
 
 ## Overview
 
-Across a document tree where **WHAT is filled but WHY is still largely `⏳`**, systematically complete WHY: scan for `⏳`, order them, dispatch each to `arch-why-elicit` to interview the person, and **check across documents that the rationales do not contradict each other**.
+Across a document tree where **WHAT is filled but WHY is still largely `⏳`**, systematically complete WHY: scan for `⏳`, order them, run `arch-why-elicit` in the foreground one item at a time to interview the person, and **check across documents that the rationales do not contradict each other**.
 
 **Core principle**: You are the **interview orchestrator** — you decide **what to ask, in what order, and whether the answers are mutually consistent**. The specifics of **how to ask a single item** (code-anchored questions plus two-way grounding) belong to `arch-why-elicit`. You do not ask specifics yourself, do not invent rationales, do not resolve conflicts on the person's behalf, and do not change WHAT.
 
-**Asymmetry with `arch-doc-orchestrate`**: This skill **cannot fan-out subagents**. `arch-why-elicit` interviews a real person, which a subagent cannot do; there is only one person, and their answers must stay consistent. The interview is therefore **foreground, sequential, and human-in-the-loop**, not parallel dispatch.
+**Asymmetry with `arch-doc-orchestrate`**: This skill **cannot fan-out subagents**. `arch-why-elicit` interviews a real person, which a subagent cannot do; there is only one person, and their answers must stay consistent. The interview is therefore **foreground, sequential, and human-in-the-loop**, not parallel work.
 
 ## When to use
 
@@ -29,7 +29,7 @@ Across a document tree where **WHAT is filled but WHY is still largely `⏳`**, 
 
 1. **Scan the whole tree for `⏳`**: list every `⏳` slot (item-level boundaries and block-level why-block headers), noting the owning document and dependency relationships.
 2. **Order (foundation-first)**: see "Ordering strategy" below.
-3. **Dispatch each item to `arch-why-elicit`**: in order, hand each `⏳` to it to interview the person and ground the answer. **Pass along already-settled upstream WHY** as question context so the person can reference it rather than restate it.
+3. **Drive `arch-why-elicit` for each item**: in order, invoke it in the foreground for each `⏳` to interview the person and ground the answer. **Pass along already-settled upstream WHY** as question context so the person can reference it rather than restate it.
 4. **Cross-document consistency check**: after each batch of answers, check that they do not contradict each other or already-settled WHY (see "Consistency check" below).
 5. **Conflict → escalate to the person**: when rationales contradict each other, produce a "conflict artifact" for the person to resolve. Do not smooth it over yourself.
 6. **Close-out report**: cleared `⏳` / remaining `⏳` (person could not answer) / conflicts / cross-document inconsistencies.

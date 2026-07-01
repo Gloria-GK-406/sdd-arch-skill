@@ -85,9 +85,10 @@ Project bootstrap:  arch-doc-orchestrate  (fan out build/update → whole WHAT t
 
 Per spec (SDD), via arch-spec-flow:
    spec finalization ─▶ declare any boundary-crossing intent IN THE SPEC (doc-path + INV-id)
-   code lands        ─▶ arch-spec-review  (completeness gate → drift / consistency check against the declaration; read-only report)
-   branch wrap-up    ─▶ arch-doc-reconcile suggests doc changes → human adopts → arch-doc-update / arch-doc-build write FROM LANDED CODE → arch-why-elicit fills new ⏳
-                        (review + reconcile are read-only, run on the best model)
+   code lands        ─▶ existing docs: arch-spec-review  (completeness gate → drift / consistency check; read-only report)
+                     └▶ no covering docs recorded in spec: skip review for that footprint
+   branch wrap-up    ─▶ arch-doc-reconcile suggests doc changes/builds from LANDED CODE → human adopts → arch-doc-update / arch-doc-build write → arch-why-elicit fills new ⏳
+                        (review + reconcile are read-only; reconcile/build path handles uncovered footprints)
    merge             ─▶ only after documents are reconciled
 ```
 

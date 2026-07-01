@@ -24,12 +24,14 @@
 
 # <unit name> · <one-line positioning>
 
-> <!-- Preamble: fixed three blocks, order unchanged. Each block 1–3 sentences, do not write long. -->
+> <!-- Preamble: fixed four lines/blocks, order unchanged. Each prose block 1–3 sentences, do not write long. -->
 >
 > **① Viewpoint level**: From which layer does this document look? Who is this
 > unit, where in the system does it sit, who is above it (assembled/called by
 > whom), who is below it (assembles/calls whom). Let the reader instantly
 > locate which cell of the map they are in.
+>
+> **Unit code**: `<unit>`
 >
 > **② Signal strength**: Each design tradeoff in the text is marked by strength—
 > 🧱 **structural convention** (harder, change with care) /
@@ -42,8 +44,9 @@
 > the skeleton and design rationale; behavioral details defer to `<code root path>`.
 
 <!-- Filling instructions (delete in final):
-  · All three blocks required, fixed order ①②③.
+  · All four preamble lines/blocks required, fixed order ① → Unit code → ② → ③.
   · ① decides what mental model the reader carries onward; be sure to state the above/below relationships clearly.
+  · Unit code is the stable `<unit>` id namespace prefix for this document; use a semantic slug in backticks.
   · ② the three symbol definitions are copied verbatim, shared across the whole document/project, do not invent per-document variants.
   · ③ the "guidance vs specification" must take a stance: which are hard (structural boundaries), which are debatable (internal implementation).
 -->
@@ -68,7 +71,7 @@
 | `<subpart A>` | `<path/a>` | <what it does> | <what it does not touch, what it does not know> |
 | `<subpart B>` | `<path/b>` | <what it does> | <what it does not touch, what it does not know> |
 
-> **Why split this way** <🧱/💡/🚧>
+> **Rationale** <🧱/💡/🚧>
 >
 > <What is the split basis (e.g. rate of change, single responsibility, testable/replaceable)?
 > Explain item by item why each subpart is independent and why the boundary is drawn this way.>
@@ -112,7 +115,7 @@ This unit splits "<one processing run>" into 3 subparts with non-overlapping res
 | C | `path/c` | <what it does> | does not touch <X>; does not know <Y> |
 | H | `path/h` | bridges A/C's writes and B's reads | pure in-memory; transient, not persisted |
 
-> **Why split this way** 🧱 (layering) / 💡 (<characteristic of some subpart>)
+> **Rationale** 🧱 (layering) / 💡 (<characteristic of some subpart>)
 >
 > The split basis is <e.g. rate of change>: isolate <what changes> from <what should stay stable>. A only carries <…>, B is <…>, and C is thereby able to <stay stable / be unit-testable / be replaceable>.
 
